@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class DragRoute extends StatefulWidget {
+class Like extends StatefulWidget {
   @override
-  _DragRouteState createState() => new _DragRouteState();
+  _LikeState createState() => new _LikeState();
 }
 
-class _DragRouteState extends State<DragRoute> {
+class _LikeState extends State<Like> {
   double _top = 50.0;
   double _top1 = 100.0;
   double _left = 150.0;

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:meizi_photo/container/drag/drag.dart';
 import 'package:meizi_photo/container/home/home.dart';
+import 'package:meizi_photo/container/image-list/image-list.dart';
 
 void main() => runApp(MyApp());
 
 Map<String, WidgetBuilder> routes =  {
   '/': (BuildContext context) => Home(),
-  '/drag': (BuildContext context) => DragRoute(),
+  '/image-list': (BuildContext context) => ImageList(),
 };
 
 class MyApp extends StatelessWidget {
@@ -28,6 +28,7 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.white,
       ),
       routes: routes,
+      
     );
   }
 }
