@@ -1,4 +1,4 @@
-package com.qiuz.meizi_photo;
+package com.example.meizi_photo;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;

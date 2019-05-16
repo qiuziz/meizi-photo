@@ -36,7 +36,7 @@ class _ImageListState extends State<ImageList> {
     _controller.addListener(() {
         double maxScroll = _controller.position.maxScrollExtent;
         double currentScroll = _controller.position.pixels;
-        double delta = 400.0; // or something else..
+        double delta = 400.0;
       if (maxScroll - currentScroll < delta) {
         getImages(_page);
       }

@@ -18,7 +18,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  var _currentIndex = 1;
+  var _currentIndex = 0;
   List<Widget> pages = List<Widget>();
   @override
   void initState() {
