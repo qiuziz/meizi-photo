@@ -105,7 +105,8 @@ class _ImageListState extends State<ImageList> {
         Navigator.push(
           context,
           new CupertinoPageRoute(
-            builder: (context) => new ImagePreview(src: _src,),
+            fullscreenDialog: true,
+            builder: (context) => new ImagePreview(url: _src,),
           ),
         );
       },
@@ -130,12 +131,14 @@ class _ImageListState extends State<ImageList> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      body: new ListView.builder(
-        itemCount: _images.length == 0 ? 1 : _images.length,
-        controller: _controller,
-        itemBuilder: (context, index) => itemBuilder(context, index),
-        // separatorBuilder: (context, index) => Divider(height: 10.0,),
-      ),
+      body: SafeArea(
+        child: new ListView.builder(
+          itemCount: _images.length == 0 ? 1 : _images.length,
+          controller: _controller,
+          itemBuilder: (context, index) => itemBuilder(context, index),
+          // separatorBuilder: (context, index) => Divider(height: 10.0,),
+        ),
+      )
     ); 
    
   }
