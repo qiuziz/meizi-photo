@@ -13,4 +13,6 @@ class ResourceApi {
   static const String LOGIN = '/login';
 
   static const String IMAGES = '/images';
+
+  static const String LIKE_LIST = '/like/list';
 }

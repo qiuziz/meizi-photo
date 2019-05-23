@@ -6,11 +6,13 @@
  * @Last Modified time: 2019-04-25 14:41:41
  */
 
+import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:meizi_photo/container/image-list/image-list.dart';
 import 'package:meizi_photo/container/like/like.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -24,9 +26,28 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     pages
-      ..add(ImageList())
-      ..add(Like());
-   
+      ..add(ImageList());
+  
+    isLogin();
+    
+  }
+
+  void isLogin() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String userInfoStr = prefs.get('userInfo');
+    Map<String, dynamic> userInfo = json.decode(userInfoStr);
+    if (null != userInfo['userId']) {
+      pages..add(Like(userId: userInfo['userId'],));
+    }
+  }
+
+  void changeTab(int index) {
+    if (index == 1) {
+      
+    }
+    setState(() {
+      _currentIndex = index;
+    });
   }
 
   @override
@@ -47,11 +68,7 @@ class _HomeState extends State<Home> {
           )
         ],
         currentIndex: _currentIndex,
-        onTap: (int index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+        onTap: changeTab,
         activeColor: Color.fromARGB(255, 215, 10, 57),
         //  type: BottomNavigationBarType.shifting,
         // child: Row(

@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:meizi_photo/container/home/home.dart';
 import 'package:meizi_photo/container/image-list/image-list.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  // 强制竖屏
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown
+  ]);
+  runApp(MyApp());
+}
 
 Map<String, WidgetBuilder> routes =  {
   '/': (BuildContext context) => Home(),

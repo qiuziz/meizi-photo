@@ -3,7 +3,7 @@
  * @Github: <https://github.com/qiuziz>
  * @Date: 2019-04-23 20:47:53
  * @Last Modified by: qiuz
- * @Last Modified time: 2019-04-25 14:41:41
+ * @Last Modified time: 2019-05-23 10:46:17
  */
 
 import 'dart:ui';
@@ -11,6 +11,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:meizi_photo/container/imge-preview/imge-preview.dart';
+import 'package:meizi_photo/container/login/login.dart';
 import 'package:meizi_photo/net/http-utils.dart';
 import 'package:meizi_photo/net/resource-api.dart';
 
@@ -52,8 +53,6 @@ class _ImageListState extends State<ImageList> {
   }
 
   void getImages([int page])  {
-    print(window.physicalSize);
-    print(page);
     if (_loading) {
       return;
     }
@@ -62,7 +61,6 @@ class _ImageListState extends State<ImageList> {
     });
     Map<String, String> queryParams = {'page': page.toString()};
     HttpUtil.get(ResourceApi.IMAGES, (result)  async {
-      print(333);
       var data = result['data'];
       _images.addAll(data);
       // final len = data.length;
@@ -95,7 +93,6 @@ class _ImageListState extends State<ImageList> {
   }
 
   Widget itemBuilder(BuildContext context, int index) {
-    print('_currentIndex $_currentIndex index $index');
     if (index >= _currentIndex - 1) {
       return loading();
     }
@@ -104,9 +101,13 @@ class _ImageListState extends State<ImageList> {
       onTap: () {
         Navigator.push(
           context,
+          // new CupertinoPageRoute(
+          //   fullscreenDialog: true,
+          //   builder: (context) => new ImagePreview(url: _src,),
+          // ),
           new CupertinoPageRoute(
             fullscreenDialog: true,
-            builder: (context) => new ImagePreview(url: _src,),
+            builder: (context) => new Login(),
           ),
         );
       },

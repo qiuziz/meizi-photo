@@ -3,16 +3,13 @@
  * @Github: <https://github.com/qiuziz>
  * @Date: 2019-04-23 17:27:35
  * @Last Modified by: qiuz
- * @Last Modified time: 2019-04-23 20:42:06
+ * @Last Modified time: 2019-05-23 10:55:33
  */
 
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:http/http.dart' as http;
-import 'package:meizi_photo/net/base-response.dart';
 import 'package:meizi_photo/net/resource-api.dart';
 Dio dio = new Dio();
 
@@ -44,9 +41,8 @@ class HttpUtil<T> {
         method: GET, headers: headers, errorCallback: errorCallback);
   }
 
-  static void post(String url, Function callback,
-      {Map<String, String> params,
-      Map<String, String> headers,
+  static void post(String url, Map<String, String> params,
+      Function callback, {Map<String, String> headers,
       Function errorCallback}) async {
     if (!url.startsWith("http")) {
       url = ResourceApi.BASE + url;
@@ -79,7 +75,6 @@ class HttpUtil<T> {
         print("GET:URL=" + url);
         res = await dio.get(url);
       }
-
       if (res.statusCode != 200) {
         errorMsg = "网络请求错误,状态码:" + res.statusCode.toString();
 
@@ -90,18 +85,19 @@ class HttpUtil<T> {
       //以下部分可以根据自己业务需求封装,这里是errorCode>=0则为请求成功,data里的是数据部分
       //记得Map中的泛型为dynamic
       var responseJson = res.data;
-      print(responseJson);
+      if (responseJson is Map && (null == responseJson['errorMsg'] || responseJson['errorMsg'].isNotEmpty)) {
+        _handError(errorCallback, responseJson['errorMsg']);
+        return;
+      }
       result['data'] = responseJson;
       // callback返回data,数据类型为dynamic
       //errorCallback中为了方便我直接返回了String类型的errorMsg
-      print(22);
       if (callback != null) {
         callback(result);
       } else {
         _handError(errorCallback, errorMsg);
       }
     } catch (exception) {
-      print(111);
       _handError(errorCallback, exception.toString());
     }
   }
