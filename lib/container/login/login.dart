@@ -29,6 +29,7 @@ class _LoginState extends State<Login> {
   FocusNode focusNode2 = new FocusNode();
   FocusScopeNode focusScopeNode;
 
+  var _loading = false;
   @override
   void initState() {
     super.initState();
@@ -40,20 +41,29 @@ class _LoginState extends State<Login> {
   }
 
   void login() {
+    if (_loading) return;
+    setState(() {
+      _loading = true;
+    });
     focusNode1.unfocus();
     focusNode2.unfocus();
     HttpUtil.post(ResourceApi.LOGIN, {'username': _usernameController.text, 'password': _pwdController.text}, (result)  async {
+       setState(() {
+        _loading = false;
+      });
       var data = result['data'];
       save(data);
       Navigator.pop(context);
     }, errorCallback: (error) {
-      print(error);
+      setState(() {
+        _loading = false;
+      });
       Fluttertoast.showToast(
         msg: error,
-        toastLength: Toast.LENGTH_SHORT,
+        toastLength: Toast.LENGTH_LONG,
         gravity: ToastGravity.CENTER,
         timeInSecForIos: 1,
-        backgroundColor: Colors.black45,
+        backgroundColor: Colors.black54,
         textColor: Colors.white,
         fontSize: 16.0
       );
@@ -126,7 +136,16 @@ class _LoginState extends State<Login> {
                     Expanded(
                       child: RaisedButton(
                         padding: EdgeInsets.all(10.0),
-                        child: Text('登录'),
+                        child: _loading
+                          ? Container(
+                              alignment: Alignment.center,
+                              child: SizedBox(
+                                width: 24.0,
+                                height: 24.0,
+                                child: CircularProgressIndicator(strokeWidth: 2.0, backgroundColor: Colors.transparent, valueColor: new AlwaysStoppedAnimation<Color>(Colors.white),),
+                              ),
+                            )
+                           : Text('登录'),
                         color: Colors.red,
                         textColor: Colors.white,
                         onPressed: login,
