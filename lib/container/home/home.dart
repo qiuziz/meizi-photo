@@ -45,6 +45,7 @@ class _HomeState extends State<Home> {
   }
 
   void changeTab(int index) {
+    isLogin();
     if (index == 1 && null == userId) {
       Navigator.push(
           context,

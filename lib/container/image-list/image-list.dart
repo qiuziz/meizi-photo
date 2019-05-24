@@ -79,6 +79,13 @@ class _ImageListState extends State<ImageList> {
     
   }
 
+  Future<Null> _refresh() async {
+    _images.clear();
+    _currentIndex = 1;
+    _page = 1;
+    getImages(1);
+  }
+
   Widget loading() {
     return Container(
         padding: const EdgeInsets.all(16.0),
@@ -128,12 +135,15 @@ class _ImageListState extends State<ImageList> {
   Widget build(BuildContext context) {
     return new Scaffold(
       body: SafeArea(
-        child: new ListView.builder(
-          itemCount: _images.length == 0 ? 1 : _images.length,
-          controller: _controller,
-          itemBuilder: (context, index) => itemBuilder(context, index),
-          // separatorBuilder: (context, index) => Divider(height: 10.0,),
-        ),
+        child: RefreshIndicator(
+          onRefresh: _refresh,
+          child: new ListView.builder(
+            itemCount: _images.length == 0 ? 1 : _images.length,
+            controller: _controller,
+            itemBuilder: (context, index) => itemBuilder(context, index),
+            // separatorBuilder: (context, index) => Divider(height: 10.0,),
+          ),
+        )
       )
     ); 
    

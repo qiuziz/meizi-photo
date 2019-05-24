@@ -7,6 +7,7 @@
  */
 
 import 'dart:ui';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -61,6 +62,7 @@ class ImagePreviewState extends State<ImagePreview> with SingleTickerProviderSta
   Animation<Offset> _animation;
   Offset _offset = Offset.zero;
   double _scale = 1.0;
+  bool _scaleTwo = false;
   Offset _normalizedOffset;
   double _previousScale;
   double _kMinFlingVelocity = 600.0;
@@ -130,9 +132,18 @@ class ImagePreviewState extends State<ImagePreview> with SingleTickerProviderSta
     Navigator.pop(context);
   }
 
+  void _handleDoubleTap() {
+    setState(() {
+       _scale =  _scaleTwo ? _scale / 2 : _scale * 2;
+       _offset = _clampOffset(Offset(-(context.size.width / 4 * _scale), -(context.size.height / 4 * _scale)));
+       _scaleTwo = !_scaleTwo;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-
+  print(_offset);
+  print(_scale);
     return Container(
         decoration: BoxDecoration(color: Colors.black),
         height: window.physicalSize.height,
@@ -141,17 +152,14 @@ class ImagePreviewState extends State<ImagePreview> with SingleTickerProviderSta
             onScaleUpdate: _handleOnScaleUpdate,
             onScaleEnd: _handleOnScaleEnd,
             onTap: _back,
-            onDoubleTap: () {
-                setState(() {
-                   _scale =  _scale * 2;
-                   _offset = _clampOffset(Offset(80, 80));
-                });
-            },
+            onDoubleTap: _handleDoubleTap,
             child: ClipRect(
               child: Transform(
                 transform: Matrix4.identity()..translate(_offset.dx, _offset.dy)
                   ..scale(_scale),
-                  child: Image.network(widget.url,),
+                  child: CachedNetworkImage(
+                      imageUrl: widget.url,
+                    ),
               ),
               // child: Image.network(widget.url,fit: BoxFit.cover,),
             ),

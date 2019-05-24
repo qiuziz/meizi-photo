@@ -26,7 +26,6 @@ class _LikeState extends State<Like> {
   static const loadingTag = "Loading...";
   var _loading = false;
   bool _loadMore = true;
-  var imageData = [];
   var _currentIndex = 1;
   int _page = 1;
   
@@ -74,6 +73,13 @@ class _LikeState extends State<Like> {
     
   }
 
+   Future<Null> _refresh() async {
+    _images.clear();
+    _currentIndex = 1;
+    _page = 1;
+    getLikes(1);
+  }
+
   Widget loading() {
     return Container(
         padding: const EdgeInsets.all(16.0),
@@ -93,7 +99,11 @@ class _LikeState extends State<Like> {
       return loading();
     }
     if (_images.length <= 0) {
-      return null;
+      return Center(
+        child: Padding(
+          padding: EdgeInsets.all(1000.0),
+        ),
+      );
     }
     final _src = _images[index]['src'];
     return GestureDetector(
@@ -120,20 +130,21 @@ class _LikeState extends State<Like> {
           ),
         ),
       ) ;
-    // return Image.network(_images[index]['src'], fit: BoxFit.cover);
-    // return Image.memory(imageData[index], fit: BoxFit.cover);
   }
   
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
       body: SafeArea(
-        child: new ListView.builder(
-          itemCount: _images.length == 0 ? 1 : _images.length,
-          controller: _controller,
-          itemBuilder: (context, index) => itemBuilder(context, index),
-          // separatorBuilder: (context, index) => Divider(height: 10.0,),
-        ),
+        child: RefreshIndicator(
+          onRefresh: _refresh,
+          child: new ListView.builder(
+            itemCount: _images.length == 0 ? 1 : _images.length,
+            controller: _controller,
+            itemBuilder: (context, index) => itemBuilder(context, index),
+            // separatorBuilder: (context, index) => Divider(height: 10.0,),
+          ),
+        )
       )
     ); 
    
