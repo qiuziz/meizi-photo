@@ -12,6 +12,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:meizi_photo/container/image-list/image-list.dart';
 import 'package:meizi_photo/container/like/like.dart';
+import 'package:meizi_photo/container/login/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
@@ -21,6 +22,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   var _currentIndex = 0;
+  String userId;
   List<Widget> pages = List<Widget>();
   @override
   void initState() {
@@ -37,13 +39,20 @@ class _HomeState extends State<Home> {
     String userInfoStr = prefs.get('userInfo');
     Map<String, dynamic> userInfo = json.decode(userInfoStr);
     if (null != userInfo['userId']) {
+      userId = userInfo['userId'];
       pages..add(Like(userId: userInfo['userId'],));
     }
   }
 
   void changeTab(int index) {
-    if (index == 1) {
-      
+    if (index == 1 && null == userId) {
+      Navigator.push(
+          context,
+          new CupertinoPageRoute(
+            fullscreenDialog: true,
+            builder: (context) => new Login(),
+          ),
+        );
     }
     setState(() {
       _currentIndex = index;

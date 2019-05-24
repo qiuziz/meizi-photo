@@ -11,7 +11,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:meizi_photo/container/imge-preview/imge-preview.dart';
-import 'package:meizi_photo/container/login/login.dart';
 import 'package:meizi_photo/net/http-utils.dart';
 import 'package:meizi_photo/net/resource-api.dart';
 
@@ -101,13 +100,9 @@ class _ImageListState extends State<ImageList> {
       onTap: () {
         Navigator.push(
           context,
-          // new CupertinoPageRoute(
-          //   fullscreenDialog: true,
-          //   builder: (context) => new ImagePreview(url: _src,),
-          // ),
           new CupertinoPageRoute(
             fullscreenDialog: true,
-            builder: (context) => new Login(),
+            builder: (context) => new ImagePreview(url: _src,),
           ),
         );
       },

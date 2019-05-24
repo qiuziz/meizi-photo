@@ -105,6 +105,8 @@ class ImagePreviewState extends State<ImagePreview> with SingleTickerProviderSta
     setState(() {
       _scale = (_previousScale * details.scale).clamp(1.0, 3.0);
       // 限制放大倍数 1~3倍
+      // print(details.focalPoint);
+      print(details.focalPoint - _normalizedOffset * _scale);
       _offset = _clampOffset(details.focalPoint - _normalizedOffset * _scale);
       // 更新当前位置
     });
@@ -139,6 +141,12 @@ class ImagePreviewState extends State<ImagePreview> with SingleTickerProviderSta
             onScaleUpdate: _handleOnScaleUpdate,
             onScaleEnd: _handleOnScaleEnd,
             onTap: _back,
+            onDoubleTap: () {
+                setState(() {
+                   _scale =  _scale * 2;
+                   _offset = _clampOffset(Offset(80, 80));
+                });
+            },
             child: ClipRect(
               child: Transform(
                 transform: Matrix4.identity()..translate(_offset.dx, _offset.dy)

@@ -92,6 +92,9 @@ class _LikeState extends State<Like> {
     if (index >= _currentIndex - 1 && _loadMore) {
       return loading();
     }
+    if (_images.length <= 0) {
+      return null;
+    }
     final _src = _images[index]['src'];
     return GestureDetector(
       onTap: () {
