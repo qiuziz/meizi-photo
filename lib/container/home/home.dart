@@ -37,7 +37,7 @@ class _HomeState extends State<Home> {
   void isLogin() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String userInfoStr = prefs.get('userInfo');
-    Map<String, dynamic> userInfo = json.decode(userInfoStr);
+    Map<String, dynamic> userInfo = null != userInfoStr ? json.decode(userInfoStr) : {};
     if (null != userInfo['userId']) {
       userId = userInfo['userId'];
       pages..add(Like(userId: userInfo['userId'],));
@@ -53,10 +53,11 @@ class _HomeState extends State<Home> {
             builder: (context) => new Login(),
           ),
         );
+    } else {
+      setState(() {
+        _currentIndex = index;
+      });
     }
-    setState(() {
-      _currentIndex = index;
-    });
   }
 
   @override

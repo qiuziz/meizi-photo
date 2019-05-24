@@ -32,14 +32,6 @@ class _LoginState extends State<Login> {
   @override
   void initState() {
     super.initState();
-    _usernameController.text = 'Hello Qiuz';
-    _usernameController.selection = TextSelection(
-      baseOffset: 0,
-      extentOffset: _usernameController.text.length
-    );
-    _usernameController.addListener(() {
-      print(_usernameController.text);
-    });
   }
 
   void save(Map<String, dynamic> userInfo) async {
@@ -71,9 +63,11 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Form'),
+        elevation: 0,
       ),
+      resizeToAvoidBottomPadding: false,
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
         child: Form(
@@ -81,15 +75,18 @@ class _LoginState extends State<Login> {
           autovalidate: true,
           child: Column(
             children: <Widget>[
+              Image.asset('assets/images/logo.png', width: 100.0,),
+              // ClipOval(
+              //    child: Image.asset('assets/images/logo.png', width: 150.0,),
+              // ),
               Container(
                 child: TextFormField(
                   controller: _usernameController,
-                  autofocus: true,
                   focusNode: focusNode1,
                   decoration: InputDecoration(
                     labelText: '用户名',
-                    hintText: '用户名或邮箱',
-                    prefixIcon: Icon(Icons.person),
+                    hintText: '请输入用户名',
+                    prefixIcon: Icon(Icons.person, color: Colors.black,),
                     border: InputBorder.none
                   ),
                   validator: (v) {
@@ -99,33 +96,39 @@ class _LoginState extends State<Login> {
                   },
                 ),
                 decoration: BoxDecoration(
-                  border: Border(bottom: BorderSide(color: Colors.grey[200], width: 1.0))
+                  border: Border(bottom: BorderSide(color: Colors.grey[700], width: 1.0))
                 ),
               ),
-              
-              TextFormField(
-                controller: _pwdController,
-                focusNode: focusNode2,
-                decoration: InputDecoration(
+              Container(
+                child: TextFormField(
+                  controller: _pwdController,
+                  focusNode: focusNode2,
+                  decoration: InputDecoration(
                   labelText: '密码',
-                  hintText: '您的登录密码',
-                  prefixIcon: Icon(Icons.lock)
+                  hintText: '请输入登录密码',
+                  prefixIcon: Icon(Icons.lock, color: Colors.black,),
+                  border: InputBorder.none
                 ),
                 obscureText: true,
                 validator: (v) {
                   return v.trim().length > 5 ? null : '密码不能少于6位';
                 },
+                ),
+                decoration: BoxDecoration(
+                  border: Border(bottom: BorderSide(color: Colors.grey[700], width: 1.0))
+                ),
               ),
+              
               Padding(
                 padding: const EdgeInsets.only(top: 28.0),
                 child: Row(
                   children: <Widget>[
                     Expanded(
                       child: RaisedButton(
-                        padding: EdgeInsets.all(15.0),
+                        padding: EdgeInsets.all(10.0),
                         child: Text('登录'),
-                        color: Theme.of(context).primaryColor,
-                        textColor: Colors.blue,
+                        color: Colors.red,
+                        textColor: Colors.white,
                         onPressed: login,
                       ),
                     )
