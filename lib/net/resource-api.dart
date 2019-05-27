@@ -15,4 +15,10 @@ class ResourceApi {
   static const String IMAGES = '/images';
 
   static const String LIKE_LIST = '/like/list';
+
+  static const String DELETE = '/delete';
+
+  static const String LIKE = '/like';
+
+  static const String UNLIKE = '/unlike';
 }

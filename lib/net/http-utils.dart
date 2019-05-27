@@ -10,6 +10,9 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:meizi_photo/component/loading/loading.dart';
 import 'package:meizi_photo/net/resource-api.dart';
 Dio dio = new Dio();
 
@@ -17,7 +20,7 @@ Dio dio = new Dio();
 class HttpUtil<T> {
   static const String GET = "get";
   static const String POST = "post";
-
+  
   static void get(String url, Function callback,
       {Map<String, String> params,
       Map<String, String> headers,
@@ -62,6 +65,18 @@ class HttpUtil<T> {
     String errorMsg;
     // int errorCode;
     var result = {};
+    Future.delayed(Duration(milliseconds: 200)).then((e) {
+      dio.interceptors.add(
+      InterceptorsWrapper(
+          onRequest: (RequestOptions options){
+          },
+          onResponse: (Response response){
+          },
+          onError: (DioError e){
+          }
+      )
+    );
+    });
     try {
       Map<String, String> headerMap = headers == null ? new Map() : headers;
       Map<String, String> paramMap = params == null ? new Map() : params;
@@ -85,7 +100,7 @@ class HttpUtil<T> {
       //以下部分可以根据自己业务需求封装,这里是errorCode>=0则为请求成功,data里的是数据部分
       //记得Map中的泛型为dynamic
       var responseJson = res.data;
-      if (responseJson is Map && (null == responseJson['errorMsg'] || responseJson['errorMsg'].isNotEmpty)) {
+      if (responseJson is Map && (null != responseJson['errorMsg'] && responseJson['errorMsg'].isNotEmpty)) {
         _handError(errorCallback, responseJson['errorMsg']);
         return;
       }

@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:meizi_photo/container/home/home.dart';
 import 'package:meizi_photo/container/image-list/image-list.dart';
 
+import 'component/loading/loading.dart';
+
 void main() {
   // 强制竖屏
   SystemChrome.setPreferredOrientations([
@@ -21,6 +23,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    Loading.ctx = context; // 注入context
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(

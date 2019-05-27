@@ -14,7 +14,7 @@ import 'package:meizi_photo/container/image-list/image-list.dart';
 import 'package:meizi_photo/container/like/like.dart';
 import 'package:meizi_photo/container/login/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:meizi_photo/component/loading/loading.dart' show Loading;
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => new _HomeState();

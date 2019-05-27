@@ -6,6 +6,7 @@
  * @Last Modified time: 2019-04-25 14:41:41
  */
 
+import 'dart:convert';
 import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -13,9 +14,13 @@ import 'package:flutter/services.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker_saver/image_picker_saver.dart';
+import 'package:meizi_photo/net/http-utils.dart';
+import 'package:meizi_photo/net/resource-api.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 class ImagePreview extends StatefulWidget {
-  const ImagePreview({Key key, this.url}) : super(key: key);
+  const ImagePreview({Key key, this.url, this.type}) : super(key: key);
   final url;
+  final type;
   @override
   State<StatefulWidget> createState() {
     return ImagePreviewState();
@@ -31,6 +36,7 @@ class ImagePreviewState extends State<ImagePreview> with SingleTickerProviderSta
   Offset _normalizedOffset;
   double _previousScale;
   double _kMinFlingVelocity = 600.0;
+  Map<String, dynamic> userInfo;
   @override
   void initState() {
     super.initState();
@@ -41,6 +47,13 @@ class ImagePreviewState extends State<ImagePreview> with SingleTickerProviderSta
       });
     });
     SystemChrome.setEnabledSystemUIOverlays([]);
+    getUserInfo();
+  }
+
+  void getUserInfo() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String userInfoStr = prefs.get('userInfo');
+    userInfo = null != userInfoStr ? json.decode(userInfoStr) : {};
   }
 
   @override
@@ -105,7 +118,72 @@ class ImagePreviewState extends State<ImagePreview> with SingleTickerProviderSta
     });
   }
 
+  void _delete(String url) {
+    HttpUtil.post(ResourceApi.DELETE, {'userId': userInfo['userId'], 'src': url}, (result)  async {
+      Navigator.pop(context);
+      Fluttertoast.showToast(
+        msg: '删除成功',
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIos: 1,
+        backgroundColor: Colors.black54,
+        textColor: Colors.white,
+        fontSize: 16.0
+      );
+      return Navigator.pop(context, url);
+    }, errorCallback: (error) {
+      Navigator.pop(context);
+      return Fluttertoast.showToast(
+        msg: '操作失败',
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIos: 1,
+        backgroundColor: Colors.black54,
+        textColor: Colors.white,
+        fontSize: 16.0
+      );
+    });
+  }
+
+  void _likeOrNot(String url) {
+    bool islikePage = widget.type == 'like';
+     HttpUtil.post(islikePage ? ResourceApi.UNLIKE : ResourceApi.LIKE , {'userId': userInfo['userId'], 'src': url}, (result)  async {
+      Navigator.pop(context);
+      Fluttertoast.showToast(
+        msg: '操作成功',
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIos: 1,
+        backgroundColor: Colors.black54,
+        textColor: Colors.white,
+        fontSize: 16.0
+      );
+
+      return Navigator.pop(context, islikePage ? url : '');
+     }, errorCallback: (error) {
+      Navigator.pop(context);
+      return Fluttertoast.showToast(
+        msg: '操作失败',
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIos: 1,
+        backgroundColor: Colors.black54,
+        textColor: Colors.white,
+        fontSize: 16.0
+      );
+    });
+  }
+
   void _handleLongPress() {
+    var deleteWidget;
+    if (null != userInfo['userId'] && userInfo['auth'] == 'admin') {
+      deleteWidget =  new ListTile(
+        leading: new Icon(Icons.save),
+        title: new Text("删除"),
+        onTap: () => _delete(widget.url),
+      );
+    }
+    String likeTitle = widget.type != 'like' ? '收藏' : '取消收藏';
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -118,9 +196,11 @@ class ImagePreviewState extends State<ImagePreview> with SingleTickerProviderSta
                 title: new Text("保存到相册"),
                 onTap: () => _saved(widget.url),
               ),
+              deleteWidget,
               new ListTile(
                 leading: new Icon(Icons.favorite),
-                title: new Text("收藏"),
+                title: new Text(likeTitle),
+                onTap: () => _likeOrNot(widget.url),
               ),
             ],
           )

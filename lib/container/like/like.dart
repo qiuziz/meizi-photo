@@ -92,6 +92,17 @@ class _LikeState extends State<Like> {
       );
   }
 
+   void viewPhoto(BuildContext context, url) async {
+    final result = await Navigator.push(
+      context,
+      new CupertinoPageRoute(
+        fullscreenDialog: true,
+        builder: (context) => new ImagePreview(url: url, type: 'like',),
+      ),
+    );
+    _images.retainWhere((img) => img['src'] != result);
+  }
+
   Widget itemBuilder(BuildContext context, int index) {
     print(index);
     print(_currentIndex);
@@ -108,13 +119,7 @@ class _LikeState extends State<Like> {
     final _src = _images[index]['src'];
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          new CupertinoPageRoute(
-            fullscreenDialog: true,
-            builder: (context) => new ImagePreview(url: _src,),
-          ),
-        );
+        viewPhoto(context, _src);
       },
       child: Container(
         child: Padding(
