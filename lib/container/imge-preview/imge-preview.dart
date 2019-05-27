@@ -10,44 +10,9 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-// class ImagePreview extends StatefulWidget {
-//   final String src;
-//   ImagePreview({Key key, @required this.src}) : super(key: key);
-//   @override
-//   _ImagePreviewState createState() => new _ImagePreviewState();
-// }
-
-// class _ImagePreviewState extends State<ImagePreview>  {
-//   double _width = window.physicalSize.width;
-
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return new Scaffold(
-//       appBar: AppBar(
-//         toolbarOpacity: .5,
-//         elevation: 0,
-//         backgroundColor: Colors.transparent,
-//       ),
-//       body: Center(
-//         child: SafeArea(
-//           child: GestureDetector(
-//             child: Image.network(widget.src, width: _width,),
-//             onScaleUpdate: (ScaleUpdateDetails e) {
-//               setState(() {
-//                 _width = window.physicalSize.width*e.scale.clamp(.8, 10.0);
-//               });
-//             },
-//           ),
-//         )
-//       ),
-//     ); 
-   
-//   }
-// }
-
-
+import 'package:extended_image/extended_image.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker_saver/image_picker_saver.dart';
 class ImagePreview extends StatefulWidget {
   const ImagePreview({Key key, this.url}) : super(key: key);
   final url;
@@ -140,10 +105,48 @@ class ImagePreviewState extends State<ImagePreview> with SingleTickerProviderSta
     });
   }
 
+  void _handleLongPress() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return new SafeArea(
+          child: new Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              new ListTile(
+                leading: new Icon(Icons.save),
+                title: new Text("保存到相册"),
+                onTap: () => _saved(widget.url),
+              ),
+              new ListTile(
+                leading: new Icon(Icons.favorite),
+                title: new Text("收藏"),
+              ),
+            ],
+          )
+        ); 
+      }
+    );
+  }
+
+ 
+ Future<bool> _saved(String url, {bool useCache: true}) async {
+  var data = await getNetworkImageData(url, useCache: useCache);
+  var filePath = await ImagePickerSaver.saveFile(fileData: data);
+  Navigator.pop(context);
+  return Fluttertoast.showToast(
+        msg: filePath != null && filePath != "" ? '保存成功' : '保存失败',
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIos: 1,
+        backgroundColor: Colors.black54,
+        textColor: Colors.white,
+        fontSize: 16.0
+      );
+  }
+
   @override
   Widget build(BuildContext context) {
-  print(_offset);
-  print(_scale);
     return Container(
         decoration: BoxDecoration(color: Colors.black),
         height: window.physicalSize.height,
@@ -151,6 +154,7 @@ class ImagePreviewState extends State<ImagePreview> with SingleTickerProviderSta
             onScaleStart: _handleOnScaleStart,
             onScaleUpdate: _handleOnScaleUpdate,
             onScaleEnd: _handleOnScaleEnd,
+            onLongPress: _handleLongPress,
             onTap: _back,
             onDoubleTap: _handleDoubleTap,
             child: ClipRect(
