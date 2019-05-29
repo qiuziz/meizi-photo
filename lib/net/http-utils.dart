@@ -10,9 +10,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:meizi_photo/component/loading/loading.dart';
 import 'package:meizi_photo/net/resource-api.dart';
 Dio dio = new Dio();
 
@@ -44,7 +41,7 @@ class HttpUtil<T> {
         method: GET, headers: headers, errorCallback: errorCallback);
   }
 
-  static void post(String url, Map<String, String> params,
+  static void post(String url, Map<String, dynamic> params,
       Function callback, {Map<String, String> headers,
       Function errorCallback}) async {
     if (!url.startsWith("http")) {
@@ -60,7 +57,7 @@ class HttpUtil<T> {
   static Future _request(String url, Function callback,
       {String method,
       Map<String, String> headers,
-      Map<String, String> params,
+      Map<String, dynamic> params,
       Function errorCallback}) async {
     String errorMsg;
     // int errorCode;
@@ -78,8 +75,8 @@ class HttpUtil<T> {
     );
     });
     try {
-      Map<String, String> headerMap = headers == null ? new Map() : headers;
-      Map<String, String> paramMap = params == null ? new Map() : params;
+      // Map<String, String> headerMap = headers == null ? new Map() : headers;
+      Map<String, dynamic> paramMap = params == null ? new Map() : params;
 
       Response res;
       if (POST == method) {

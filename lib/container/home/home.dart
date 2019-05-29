@@ -11,10 +11,8 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:meizi_photo/container/image-list/image-list.dart';
-import 'package:meizi_photo/container/like/like.dart';
 import 'package:meizi_photo/container/login/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:meizi_photo/component/loading/loading.dart' show Loading;
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => new _HomeState();
@@ -40,7 +38,7 @@ class _HomeState extends State<Home> {
     Map<String, dynamic> userInfo = null != userInfoStr ? json.decode(userInfoStr) : {};
     if (null != userInfo['userId']) {
       userId = userInfo['userId'];
-      pages..add(Like(userId: userInfo['userId'],));
+      pages..add(ImageList(type: 'like', userId: userInfo['userId'],));
     }
   }
 
