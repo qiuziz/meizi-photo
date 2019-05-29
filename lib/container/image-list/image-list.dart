@@ -3,7 +3,7 @@
  * @Github: <https://github.com/qiuziz>
  * @Date: 2019-04-23 20:47:53
  * @Last Modified by: qiuz
- * @Last Modified time: 2019-05-29 17:03:47
+ * @Last Modified time: 2019-05-29 18:04:25
  */
 
 import 'dart:convert';
@@ -106,6 +106,7 @@ class _ImageListState extends State<ImageList> {
     _images.clear();
     _currentIndex = 1;
     _page = 1;
+    _loadMore = true;
     getImages(1);
   }
 
