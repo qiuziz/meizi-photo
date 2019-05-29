@@ -3,7 +3,7 @@
  * @Github: <https://github.com/qiuziz>
  * @Date: 2019-05-23 10:47:44
  * @Last Modified by: qiuz
- * @Last Modified time: 2019-05-23 10:56:53
+ * @Last Modified time: 2019-05-29 17:39:48
  */
 
 import 'dart:convert';
@@ -53,7 +53,7 @@ class _LoginState extends State<Login> {
       });
       var data = result['data'];
       save(data);
-      Navigator.pop(context);
+      Navigator.pop(context, true);
     }, errorCallback: (error) {
       setState(() {
         _loading = false;

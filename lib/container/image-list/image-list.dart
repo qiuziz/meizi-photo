@@ -3,7 +3,7 @@
  * @Github: <https://github.com/qiuziz>
  * @Date: 2019-04-23 20:47:53
  * @Last Modified by: qiuz
- * @Last Modified time: 2019-05-23 10:46:17
+ * @Last Modified time: 2019-05-29 17:03:47
  */
 
 import 'dart:convert';
@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker_saver/image_picker_saver.dart';
 import 'package:meizi_photo/container/imge-preview/imge-preview.dart';
+import 'package:meizi_photo/container/login/login.dart';
 import 'package:meizi_photo/net/http-utils.dart';
 import 'package:meizi_photo/net/resource-api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -76,27 +77,29 @@ class _ImageListState extends State<ImageList> {
     Map<String, String> queryParams = {'page': page.toString()};
     bool islikePage = widget.type == 'like';
     !islikePage
-    ? HttpUtil.get(ResourceApi.IMAGES, (result) async {
-        var data = result['data'];
-        _images.addAll(data);
-        setState(() {
-          _page = ++page;
-          _loading = false;
-          _currentIndex = _images.length;
-        });
-      }, params: queryParams)
-    : HttpUtil.post(ResourceApi.LIKE_LIST, {'userId': widget.userId, 'page': page},(result)  async {
-      var data = result['data'];
-       _images.addAll(data);
-      final len = data.length;
-      print(data);
-      setState(()  {
-        _page = ++page;
-        _loading = false;
-        _loadMore = len < 10 ? false : true;
-         _currentIndex = _images.length;
-      });
-    });
+        ? HttpUtil.get(ResourceApi.IMAGES, (result) async {
+            var data = result['data'];
+            _images.addAll(data);
+            setState(() {
+              _page = ++page;
+              _loading = false;
+              _currentIndex = _images.length;
+            });
+          }, params: queryParams)
+        : HttpUtil.post(
+            ResourceApi.LIKE_LIST, {'userId': widget.userId, 'page': page},
+            (result) async {
+            var data = result['data'];
+            _images.addAll(data);
+            final len = data.length;
+            print(data);
+            setState(() {
+              _page = ++page;
+              _loading = false;
+              _loadMore = len < 10 ? false : true;
+              _currentIndex = _images.length;
+            });
+          });
   }
 
   Future<Null> _refresh() async {
@@ -177,6 +180,18 @@ class _ImageListState extends State<ImageList> {
   }
 
   void _likeOrNot(String url) {
+    if (null == userInfo['userId']) {
+      Navigator.pop(context);
+      Navigator.push(
+        context,
+        new CupertinoPageRoute(
+          fullscreenDialog: true,
+          builder: (context) => new Login(),
+        ),
+      );
+      return;
+    }
+
     bool islikePage = widget.type == 'like';
     HttpUtil.post(islikePage ? ResourceApi.UNLIKE : ResourceApi.LIKE,
         {'userId': userInfo['userId'], 'src': url}, (result) async {
@@ -245,8 +260,14 @@ class _ImageListState extends State<ImageList> {
       title: Text('提示'),
       content: Text(_confirmContent),
       actions: <Widget>[
-        FlatButton(onPressed: sureFunction, child: Text('确定', style: TextStyle(color: Colors.blue)), ),
-        FlatButton(onPressed: cancelFunction, child: Text('取消', style: TextStyle(color: Colors.blue)), ),
+        FlatButton(
+          onPressed: sureFunction,
+          child: Text('确定', style: TextStyle(color: Colors.blue)),
+        ),
+        FlatButton(
+          onPressed: cancelFunction,
+          child: Text('取消', style: TextStyle(color: Colors.blue)),
+        ),
       ],
     );
   }
@@ -257,19 +278,11 @@ class _ImageListState extends State<ImageList> {
     }
     final _src = _images[index]['src'];
     return new Dismissible(
-      //  direction: DismissDirection.endToStart,
+      direction: userInfo['auth'] == 'admin'
+          ? DismissDirection.horizontal
+          : DismissDirection.startToEnd,
       key: new Key(_images[index]['_id']),
-      //在child被取消时调用
-      onDismissed: (direction) {
-        print(direction);
-        // _images.removeAt(index);
-        // //这个和Android的SnackBar差不多
-        // Scaffold.of(context)
-        //     .showSnackBar(new SnackBar(content: new Text("$index dismissed")));
-      },
       background: Container(
-        // color: Colors.green,
-        // 这里使用 ListTile 因为可以快速设置左右两端的Icon
         child: Padding(
           padding: const EdgeInsets.only(left: 20.0),
           child: Row(
@@ -288,10 +301,7 @@ class _ImageListState extends State<ImageList> {
           ),
         ),
       ),
-
       secondaryBackground: Container(
-        // color: Colors.red,
-        // 这里使用 ListTile 因为可以快速设置左右两端的Icon
         child: Padding(
           padding: const EdgeInsets.only(right: 20.0),
           child: Row(
@@ -320,13 +330,10 @@ class _ImageListState extends State<ImageList> {
         if (direction == DismissDirection.endToStart) {
           // 从右向左  也就是删除
           _confirmContent = '确认删除？';
-          _alertDialog = _createDialog(
-            _confirmContent,
-            () => _delete(_src),
-            () {
-              Navigator.of(context).pop(false);
-            }
-          );
+          _alertDialog =
+              _createDialog(_confirmContent, () => _delete(_src), () {
+            Navigator.of(context).pop(false);
+          });
         } else if (direction == DismissDirection.startToEnd) {
           _confirmContent = '确认收藏？';
           _alertDialog = _createDialog(
@@ -348,27 +355,24 @@ class _ImageListState extends State<ImageList> {
       },
       child: GestureDetector(
         onTap: () => viewPhoto(context, _src),
-        // onHorizontalDragUpdate: (DragUpdateDetails detail) {
-        //    print(detail);
-        // },
         onLongPress: () => _handleLongPress(_src),
         child: Container(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: new ClipRRect(
-              borderRadius: BorderRadius.circular(10.0),
-              child: CachedNetworkImage(
-                imageUrl: _src,
-                placeholder: (context, url) => loading(),
-                errorWidget: (context, url, error) => new Icon(Icons.error),
+            child: Center(
+              child: new ClipRRect(
+                borderRadius: BorderRadius.circular(10.0),
+                child: CachedNetworkImage(
+                  imageUrl: _src,
+                  placeholder: (context, url) => loading(),
+                  errorWidget: (context, url, error) => new Icon(Icons.error),
+                ),
               ),
             ),
           ),
         ),
       ),
     );
-    // return Image.network(_images[index]['src'], fit: BoxFit.cover);
-    // return Image.memory(imageData[index], fit: BoxFit.cover);
   }
 
   @override
@@ -381,7 +385,6 @@ class _ImageListState extends State<ImageList> {
         itemCount: _images.length == 0 ? 1 : _images.length,
         controller: _controller,
         itemBuilder: (context, index) => itemBuilder(context, index),
-        // separatorBuilder: (context, index) => Divider(height: 10.0,),
       ),
     )));
   }

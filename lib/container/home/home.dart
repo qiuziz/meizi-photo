@@ -3,13 +3,14 @@
  * @Github: <https://github.com/qiuziz>
  * @Date: 2019-04-23 20:47:53
  * @Last Modified by: qiuz
- * @Last Modified time: 2019-04-25 14:41:41
+ * @Last Modified time: 2019-05-29 17:51:36
  */
 
 import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:meizi_photo/container/drawer/drawer.dart';
 import 'package:meizi_photo/container/image-list/image-list.dart';
 import 'package:meizi_photo/container/login/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,38 +21,47 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   var _currentIndex = 0;
+  bool login = false;
   String userId;
   List<Widget> pages = List<Widget>();
+  Map<String, dynamic> userInfo;
   @override
   void initState() {
     super.initState();
     pages
-      ..add(ImageList());
+      ..add(ImageList(type: 'home',));
   
-    isLogin();
+    addLike();
     
   }
 
-  void isLogin() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String userInfoStr = prefs.get('userInfo');
-    Map<String, dynamic> userInfo = null != userInfoStr ? json.decode(userInfoStr) : {};
-    if (null != userInfo['userId']) {
+  Future addLike() async {
+    if (await isLogin() != null) {
+      login = true;
       userId = userInfo['userId'];
       pages..add(ImageList(type: 'like', userId: userInfo['userId'],));
     }
   }
 
-  void changeTab(int index) {
-    isLogin();
-    if (index == 1 && null == userId) {
-      Navigator.push(
+  Future<String> isLogin() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String userInfoStr = prefs.get('userInfo');
+    userInfo = null != userInfoStr ? json.decode(userInfoStr) : {};
+    return userInfo['userId'];
+  }
+
+  void changeTab(int index) async {
+    if (index == 1 && await isLogin() == null) {
+      final result = await Navigator.push(
           context,
           new CupertinoPageRoute(
             fullscreenDialog: true,
             builder: (context) => new Login(),
           ),
         );
+      if (null != result) {
+        addLike();
+      }
     } else {
       setState(() {
         _currentIndex = index;
@@ -62,6 +72,21 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
+      appBar: AppBar(
+        title: new Text('Meizi Photo'),
+        elevation: 0,
+        actions: <Widget>[
+            Builder(
+              builder: (context) => IconButton(
+                    icon: Icon(Icons.settings),
+                    onPressed: () => Scaffold.of(context).openEndDrawer(),
+                    tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
+                  ),
+            ),
+        ],
+      ),
+      endDrawer: new MyDrawer(login: login),
+      
       bottomNavigationBar: CupertinoTabBar(
         iconSize: 25.0,
         // color: Colors.white,
