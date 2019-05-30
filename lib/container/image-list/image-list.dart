@@ -3,7 +3,7 @@
  * @Github: <https://github.com/qiuziz>
  * @Date: 2019-04-23 20:47:53
  * @Last Modified by: qiuz
- * @Last Modified time: 2019-05-29 18:04:25
+ * @Last Modified time: 2019-05-30 18:01:42
  */
 
 import 'dart:convert';
@@ -14,6 +14,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker_saver/image_picker_saver.dart';
+import 'package:meizi_photo/component/custom-route/custom-route.dart';
 import 'package:meizi_photo/container/imge-preview/imge-preview.dart';
 import 'package:meizi_photo/container/login/login.dart';
 import 'package:meizi_photo/net/http-utils.dart';
@@ -127,12 +128,14 @@ class _ImageListState extends State<ImageList> {
   void viewPhoto(BuildContext context, url) async {
     final result = await Navigator.push(
       context,
-      new CupertinoPageRoute(
-        fullscreenDialog: true,
-        builder: (context) => new ImagePreview(
-              url: url,
-            ),
-      ),
+      PageRouteBuilder(
+        pageBuilder: (BuildContext context, Animation animation, Animation secondaryAnimation) {
+          return new FadeTransition(
+            opacity: animation,
+            child: ImagePreview(url: url,),
+          );
+        }
+      )
     );
     _images.retainWhere((img) => img['src'] != result);
   }
@@ -354,19 +357,22 @@ class _ImageListState extends State<ImageList> {
             });
         return isDismiss;
       },
-      child: GestureDetector(
-        onTap: () => viewPhoto(context, _src),
-        onLongPress: () => _handleLongPress(_src),
-        child: Container(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Center(
-              child: new ClipRRect(
-                borderRadius: BorderRadius.circular(10.0),
-                child: CachedNetworkImage(
-                  imageUrl: _src,
-                  placeholder: (context, url) => loading(),
-                  errorWidget: (context, url, error) => new Icon(Icons.error),
+      child: Hero(
+        tag: _src,
+        child: GestureDetector(
+          onTap: () => viewPhoto(context, _src),
+          onLongPress: () => _handleLongPress(_src),
+          child: Container(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Center(
+                child: new ClipRRect(
+                  borderRadius: BorderRadius.circular(10.0),
+                  child: CachedNetworkImage(
+                    imageUrl: _src,
+                    placeholder: (context, url) => loading(),
+                    errorWidget: (context, url, error) => new Icon(Icons.error),
+                  ),
                 ),
               ),
             ),

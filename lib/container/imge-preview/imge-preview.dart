@@ -3,7 +3,7 @@
  * @Github: <https://github.com/qiuziz>
  * @Date: 2019-04-23 20:47:53
  * @Last Modified by: qiuz
- * @Last Modified time: 2019-04-25 14:41:41
+ * @Last Modified time: 2019-05-30 17:45:27
  */
 
 import 'dart:convert';
@@ -230,24 +230,27 @@ class ImagePreviewState extends State<ImagePreview> with SingleTickerProviderSta
     return Container(
         decoration: BoxDecoration(color: Colors.black),
         height: window.physicalSize.height,
-          child: GestureDetector(
-            onScaleStart: _handleOnScaleStart,
-            onScaleUpdate: _handleOnScaleUpdate,
-            onScaleEnd: _handleOnScaleEnd,
-            onLongPress: _handleLongPress,
-            onTap: _back,
-            onDoubleTap: _handleDoubleTap,
-            child: ClipRect(
-              child: Transform(
-                transform: Matrix4.identity()..translate(_offset.dx, _offset.dy)
-                  ..scale(_scale),
-                  child: CachedNetworkImage(
-                      imageUrl: widget.url,
-                    ),
+          child: new Hero(
+            tag: widget.url,
+            child: GestureDetector(
+              onScaleStart: _handleOnScaleStart,
+              onScaleUpdate: _handleOnScaleUpdate,
+              onScaleEnd: _handleOnScaleEnd,
+              onLongPress: _handleLongPress,
+              onTap: _back,
+              onDoubleTap: _handleDoubleTap,
+              child: ClipRect(
+                child: Transform(
+                  transform: Matrix4.identity()..translate(_offset.dx, _offset.dy)
+                    ..scale(_scale),
+                    child: CachedNetworkImage(
+                        imageUrl: widget.url,
+                      ),
+                ),
+                // child: Image.network(widget.url,fit: BoxFit.cover,),
               ),
-              // child: Image.network(widget.url,fit: BoxFit.cover,),
             ),
-          )
+          ) 
       );
   }
 }
